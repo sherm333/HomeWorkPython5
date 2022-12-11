@@ -1,56 +1,52 @@
-# Игра с конфетами. Дано N конфет. 
-# Каждый игрок за каждый ход может взять не более M конфет.
-# Побеждает игрок,забравший последнюю конфету.
+# Создайте программу для игры с конфетами человек против человека. 
+# Условие задачи: На столе лежит 2021 конфета. 
+# Играют два игрока делая ход друг после друга. Первый ход определяется жеребьёвкой. 
+# За один ход можно забрать не более чем 28 конфет. 
+# Все конфеты оппонента достаются сделавшему последний ход. 
+# Сколько конфет нужно взять первому игроку, чтобы забрать все конфеты у своего конкурента?
+# a) Добавьте игру против бота
+# б) Подумайте, как наделить бота "интеллектом"
 
-import random
+# вариант человек против бота:
+from random import randint
 
-greeting = ('Здравствуйте! Вас приветствует игра "Забери все конфеты!" '
-    'Основные правила игры: '
-    'Нам будет дано некоторое количество конфет, '
-    'за один ход мы можем взять не более определённого количества, '
-    'о котором мы с вами договоримся.'
-    'Итак, начнём!')
-            
-
-messages = ['Ваша очередь брать конфеты', 'возьмите конфеты', 
-            'сколько конфет возьмёте?', 'берите, не стесняйтесь', 'Ваш ход']
+def input_dat(name):
+    x = int(input(f"{name}, введите количество конфет, которое возьмете от 1 до 28: "))
+    while x < 1 or x > 28:
+        x = int(input(f"{name}, введите корректное количество конфет: "))
+    return x
 
 
-def play_game(n, m, players, messages):
-    count = 0
-    if n%10 == 1 and 9 > n > 10: letter = 'а'
-    elif 1 < n%10 < 5 and 9 > n > 10: letter = 'ы'
-    else: letter = ''
-    while n > 0:
-        print(f'{players[count%2]}, {random.choice(messages)}')
-        move = int(input())
-        if move > n or move > m:
-            print(f'Это слишком много, можно взять не более {m} конфет{letter}, у нас всего {n} конфет{letter}')
-            attempt = 3
-            while attempt > 0:
-                if n >= move <= m:
-                    break
-                print(f'Попробуйте ещё раз, у Вас {attempt} попытки')
-                move = int(input())
-                attempt -=1
-            else: 
-                return print(f'Очень жаль, у Вас не осталось попыток. Game over!')
-        n = n - move
-        if n > 0: print(f'Осталось {n} конфет{letter}')
-        else: print('Все конфеты разобраны.')
-        count +=1
-    return players[not count%2]
+def p_print(name, k, counter, value):
+    print(f"Ходил {name}, он взял {k}, теперь у него {counter}. Осталось на столе {value} конфет.")
 
-print(greeting)
+player1 = input("Введите имя первого игрока: ")
+player2 = "Bot"
+value = int(input("Введите количество конфет на столе: "))
+flag = randint(0,2) # флаг очередности
+if flag:
+    print(f"Первый ходит {player1}")
+else:
+    print(f"Первый ходит {player2}")
 
-player1 = input('Давайте познакомися. Первый игрок, как к Вам можно обращаться?\n')
-player2 = input('Второй игрок, и Вы представьтесь, пожалуйста\n')
-players = [player1, player2]
+counter1 = 0 
+counter2 = 0
 
-n = int(input('Сколько конфет будем разыгрывать?\n '))
-m = int(input('Сколько максимально будем брать конфет за один ход?\n '))
+while value > 28:
+    if flag:
+        k = input_dat(player1)
+        counter1 += k
+        value -= k
+        flag = False
+        p_print(player1, k, counter1, value)
+    else:
+        k = randint(1,29)
+        counter2 += k
+        value -= k
+        flag = True
+        p_print(player2, k, counter2, value)
 
-winner = play_game(n, m, players, messages)
-if not winner:
-    print('У нас нет победителя.')
-else: print(f'Поздравляю! В этот раз победил {winner}! Ему достаются все конфеты!')
+if flag:
+    print(f"Выиграл {player1}")
+else:
+    print(f"Выиграл {player2}")
